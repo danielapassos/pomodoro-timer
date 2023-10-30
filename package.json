@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "lint": "eslint src --ext .ts,.tsx",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -18,7 +17,6 @@
     "styled-components": "^6.1.0"
   },
   "devDependencies": {
-    "@rocketseat/eslint-config": "^2.1.0",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
