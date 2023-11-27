@@ -1,5 +1,5 @@
-import { Play } from "phosphor-react";
-import { CountdownContainer, FormContainer, HomeContainer, MinutesAmountInput, Separator, StartCountdownButton, TaskInput } from "./styles";
+import { HandPalm, Play } from "phosphor-react";
+import { CountdownContainer, FormContainer, HomeContainer, MinutesAmountInput, Separator, StartCountdownButton, TaskInput, StopCountdownButton } from "./styles";
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as zod from 'zod'
@@ -33,7 +33,7 @@ export function Home() {
         }
     })
 
-    const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+    const activeCycle = cycles.find((cycle) => cycle.id === activeCycleID)
 
     useEffect(() => {
         if (activeCycle) {
@@ -57,11 +57,10 @@ export function Home() {
 
         setCycles( (state) => [...state, newCycle])
         setactiveCycleID(id)
+        setAmountSecondsPassed(0)
 
         reset()
     }
-
-    const activeCycle = cycles.find((cycle) => cycle.id === activeCycleID)
 
     const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0 
     const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
@@ -113,11 +112,19 @@ export function Home() {
                     <span>{seconds[1]}</span>
                 </CountdownContainer>
 
-
-                <StartCountdownButton disabled={isSubmitDisabled} type="submit">
+                { activeCycle ? (
+                    <StopCountdownButton type="button">
+                    <HandPalm size={24} />
+                    Interrupt
+                </StopCountdownButton>
+                ) : (
+                    <StartCountdownButton disabled={isSubmitDisabled} type="submit">
                     <Play size={24} />
                     Start
                 </StartCountdownButton>
+                )}
+
+                
 
             </form>
         </HomeContainer>
