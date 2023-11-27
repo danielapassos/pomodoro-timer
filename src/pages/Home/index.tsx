@@ -17,7 +17,8 @@ interface Cycle {
     id: string;
     task: string;
     minutesAmount: number;
-    startDate: Date
+    startDate: Date;
+    interrupedDate?: Date;
 }
 
 export function Home() {
@@ -62,6 +63,19 @@ export function Home() {
         reset()
     }
 
+    function handleInterruptCycle (){
+        setCycles(
+            cycles.map(cycle => {
+                if (cycle.id === activeCycleID){
+                    return {...cycle, interrupedDate: new Date()}
+                } else {
+                    return cycle
+                }
+            })
+        )
+        setactiveCycleID(null)
+    }
+
     const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0 
     const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
     const minutesAmount = Math.floor(currentSeconds / 60)
@@ -78,11 +92,11 @@ export function Home() {
             <form onSubmit={handleSubmit(handleCreateNewCycle)} action="">
                 <FormContainer>
                     <label htmlFor="task">I am working on</label>
-
                     <TaskInput 
                         id="task" 
                         list="task-suggestions"
                         placeholder="Give your project a name"
+                        disabled={!!activeCycle}
                         {...register('task')}
                         />
                     <datalist id="task-suggestions">
@@ -90,7 +104,6 @@ export function Home() {
                         <option value="Project 2"/>
                         <option value="Project 3"/>
                     </datalist>
-
                     <label htmlFor="minutesAmount">during</label>
                     <MinutesAmountInput
                         type="number"
@@ -99,6 +112,7 @@ export function Home() {
                         step={5}
                         min={5}
                         max={60}
+                        disabled={!!activeCycle}
                         {...register('minutesAmount', {valueAsNumber: true})}
                     />
                     <span>minutes.</span>
@@ -113,7 +127,7 @@ export function Home() {
                 </CountdownContainer>
 
                 { activeCycle ? (
-                    <StopCountdownButton type="button">
+                    <StopCountdownButton onClick={handleInterruptCycle} type="button">
                     <HandPalm size={24} />
                     Interrupt
                 </StopCountdownButton>
