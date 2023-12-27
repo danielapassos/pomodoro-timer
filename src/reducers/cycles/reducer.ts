@@ -1,11 +1,12 @@
 import { ActionTypes } from "./actions";
+import { produce } from "immer"
 
 export interface Cycle {
     id: string;
     task: string;
     minutesAmount: number;
     startDate: Date;
-    interrupedDate?: Date;
+    interruptedDate?: Date;
     finishedDate?: Date;
 }
 
@@ -18,36 +19,36 @@ export function cyclesReducer(state:CyclesState, action: any) {
         
         switch(action.type){
             case ActionTypes.ADD_NEW_CYCLE:
-                return {
-                    ...state, 
-                    cycles: [...state.cycles, action.payload.newCycle],
-                    activeCycleID: action.payload.newCycle.id,
+                return produce(state, (draft) => {
+                    draft.cycles.push(action.payload.newCycle)
+                    draft.activeCycleID = action.payload.newCycle.id
+                })
+
+            case ActionTypes.INTERRUPT_CURRENT_CYCLE: {
+                const currentCycleIndex = state.cycles.findIndex((cycle) => {
+                    return cycle.id === state.activeCycleID
+                })
+                if (currentCycleIndex < 0){
+                    return state
                 }
+                return produce(state, (draft) =>{
+                    draft.cycles[currentCycleIndex].interruptedDate = new Date()
+                    draft.activeCycleID = null
+                })
+            }
 
-            case ActionTypes.INTERRUPT_CURRENT_CYCLE:
-                return {
-                    ...state,
-                    cycles: state.cycles.map(cycle => {
-                                if (cycle.id === state.activeCycleID){
-                                    return {...cycle, interrupedDate: new Date()}
-                                } else {
-                                    return cycle
-                                }
-                            }),
-                        activeCycleID: null,
-
+            case ActionTypes.MARK_CURRENT_CYCLE_AS_FINISHED: {
+                const currentCycleIndex = state.cycles.findIndex((cycle) => {
+                    return cycle.id === state.activeCycleID
+                })
+                if (currentCycleIndex < 0){
+                    return state
                 }
-
-            case ActionTypes.MARK_CURRENT_CYCLE_AS_FINISHED:
-                return{
-                    ...state,
-                    cycles: state.cycles.map(cycle => {
-                        if (cycle.id === state.activeCycleID){
-                            return {...cycle, finishedDate: new Date()}
-                        } else {
-                            return cycle
-                        }
-                    })}
+                return produce(state, (draft) =>{
+                    draft.cycles[currentCycleIndex].finishedDate = new Date()
+                    draft.activeCycleID = null
+                })
+            }
 
             default:
                 return state
